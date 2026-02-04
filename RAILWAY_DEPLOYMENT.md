@@ -19,7 +19,7 @@ Railway will auto-detect the build. If not, configure manually:
 
 **Environment Variables:**
 ```
-OPENROUTER_API_KEY=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
+OPENROUTER_API_KEY=your-api-key-here
 OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
 LLM_MODEL=gpt-4-turbo
 LLM_TEMPERATURE=0.1
