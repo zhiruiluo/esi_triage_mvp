@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install backend deps
+        run: |
+          cd new_rag_system/app
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Install test dependencies
+        run: |
+          cd new_rag_system/app
+          pip install pytest httpx
+      - name: Backend smoke import
+        run: |
+          cd new_rag_system/app
+          python -c "import main"
+      - name: Run comprehensive API tests
+        run: |
+          cd new_rag_system/app
+          python test_api.py
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_BASE_URL: https://openrouter.ai/api/v1
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+      - name: Install frontend deps
+        run: |
+          cd new_rag_system/nextjs-app
+          npm install
+      - name: Build frontend
+        run: |
+          cd new_rag_system/nextjs-app
+          npm run build
