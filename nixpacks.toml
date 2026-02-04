@@ -3,6 +3,7 @@ nixPkgs = ["python311", "python311Packages.pip", "python311Packages.setuptools",
 
 [phases.install]
 cmds = [
+	"cd app && python -m ensurepip --upgrade",
 	"cd app && python -m pip install --upgrade pip setuptools wheel",
 	"cd app && python -m pip install -r requirements.txt"
 ]
