@@ -45,6 +45,7 @@ async def classify(request: Request, payload: ClassifyRequest):
         "intermediate": {
             "red_flags": result.get("flags", []),
             "severity": result.get("severity_score", 0.0),
+            "has_red_flags": result.get("has_red_flags", False),
         },
         "queries_remaining": rate_limiter.get_remaining(client_ip),
     }
@@ -61,4 +62,6 @@ async def info():
         "name": settings.API_TITLE,
         "version": settings.API_VERSION,
         "environment": "mvp",
+        "model": settings.LLM_MODEL,
+        "rate_limit": settings.RATE_LIMIT_PER_DAY,
     }

@@ -49,6 +49,7 @@ class RedFlagDetector:
                 "reason": "Missing OPENROUTER_API_KEY",
                 "flags": [],
                 "severity_score": 0.0,
+                "has_red_flags": False,
             }
 
         try:
@@ -65,12 +66,14 @@ class RedFlagDetector:
 
             result = json.loads(response.choices[0].message.content)
 
+            flags = result.get("flags_detected", [])
             return {
                 "esi": result.get("esi_level", 3),
                 "confidence": result.get("confidence", 0.0),
                 "reason": result.get("reasoning", ""),
-                "flags": result.get("flags_detected", []),
+                "flags": flags,
                 "severity_score": result.get("severity_score", 0.0),
+                "has_red_flags": result.get("has_red_flags", bool(flags)),
             }
         except Exception as exc:
             return {
@@ -79,4 +82,5 @@ class RedFlagDetector:
                 "reason": f"Classification error: {exc}",
                 "flags": [],
                 "severity_score": 0.0,
+                "has_red_flags": False,
             }

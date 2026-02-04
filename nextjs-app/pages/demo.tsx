@@ -74,6 +74,12 @@ export default function DemoPage() {
           <h2>Result: ESI-{result.esi_level}</h2>
           <p>Confidence: {(result.confidence * 100).toFixed(1)}%</p>
           <p>Reason: {result.reason}</p>
+          <p>
+            Red flags: {result.intermediate?.has_red_flags ? "Yes" : "No"}
+          </p>
+          <p>
+            Severity score: {(result.intermediate?.severity ?? 0).toFixed(2)}
+          </p>
           <p>Remaining today: {result.queries_remaining}</p>
 
           {result.intermediate?.red_flags?.length > 0 && (
