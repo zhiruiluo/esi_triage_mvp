@@ -33,8 +33,11 @@ Return JSON:
 
 class RedFlagDetector:
     def __init__(self) -> None:
+        if not settings.OPENROUTER_API_KEY:
+            raise ValueError("OPENROUTER_API_KEY environment variable is required")
+        
         self.client = AsyncOpenAI(
-            api_key=settings.OPENROUTER_API_KEY or None,
+            api_key=settings.OPENROUTER_API_KEY,
             base_url=settings.OPENROUTER_BASE_URL,
         )
 

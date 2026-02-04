@@ -27,6 +27,9 @@ jobs:
         run: |
           cd app
           python -c "import main"
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_BASE_URL: https://openrouter.ai/api/v1
       - name: Run comprehensive API tests
         run: |
           cd app
