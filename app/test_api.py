@@ -71,7 +71,9 @@ def test_rate_limiting_logic():
     
     # Create temporary limiter with modified settings
     original_limit = settings.RATE_LIMIT_PER_DAY
+    original_budget = settings.FREE_TIER_DAILY_BUDGET_USD
     settings.RATE_LIMIT_PER_DAY = 3
+    settings.FREE_TIER_DAILY_BUDGET_USD = 0.05
     limiter = RateLimiter()
     test_ip = "192.168.1.100"
     
@@ -88,6 +90,28 @@ def test_rate_limiting_logic():
     
     # Restore original limit
     settings.RATE_LIMIT_PER_DAY = original_limit
+    settings.FREE_TIER_DAILY_BUDGET_USD = original_budget
+
+
+def test_budget_limit_logic():
+    """Test free-tier budget limit functionality"""
+    from auth import RateLimiter
+    from config import settings
+
+    original_budget = settings.FREE_TIER_DAILY_BUDGET_USD
+    settings.FREE_TIER_DAILY_BUDGET_USD = 0.01
+    limiter = RateLimiter()
+    test_ip = "192.168.1.101"
+
+    allowed, _ = limiter.check_limit(test_ip)
+    assert allowed
+
+    limiter.add_cost(test_ip, 0.02)
+    allowed, msg = limiter.check_limit(test_ip)
+    assert not allowed
+    assert "Free-tier budget exceeded" in msg
+
+    settings.FREE_TIER_DAILY_BUDGET_USD = original_budget
 
 
 def test_classify_response_structure():
@@ -104,6 +128,7 @@ def test_classify_response_structure():
     assert "confidence" in data
     assert "reason" in data
     assert "queries_remaining" in data
+    assert "cost" in data
 
 
 def test_classify_invalid_method():
@@ -133,6 +158,7 @@ if __name__ == "__main__":
         test_classify_empty_case_text,
         test_classify_valid_case_no_api_key,
         test_rate_limiting_logic,
+        test_budget_limit_logic,
         test_classify_response_structure,
         test_classify_invalid_method,
         test_classify_malformed_json,

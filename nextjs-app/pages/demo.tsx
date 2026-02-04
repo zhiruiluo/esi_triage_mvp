@@ -80,6 +80,12 @@ export default function DemoPage() {
           <p>
             Severity score: {(result.intermediate?.severity ?? 0).toFixed(2)}
           </p>
+          <p>
+            Estimated cost: ${Number(result.cost?.estimated_cost_usd || 0).toFixed(4)}
+          </p>
+          <p>
+            Budget remaining: ${Number(result.cost?.budget_remaining_usd || 0).toFixed(2)}
+          </p>
           <p>Remaining today: {result.queries_remaining}</p>
 
           {result.intermediate?.red_flags?.length > 0 && (

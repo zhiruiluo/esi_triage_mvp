@@ -16,6 +16,9 @@ class Settings:
     LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "300"))
 
     RATE_LIMIT_PER_DAY = int(os.getenv("RATE_LIMIT_PER_DAY", "20"))
+    FREE_TIER_DAILY_BUDGET_USD = float(os.getenv("FREE_TIER_DAILY_BUDGET_USD", "1.00"))
+    COST_PER_1K_INPUT = float(os.getenv("COST_PER_1K_INPUT", "0.01"))
+    COST_PER_1K_OUTPUT = float(os.getenv("COST_PER_1K_OUTPUT", "0.03"))
 
 
 settings = Settings()

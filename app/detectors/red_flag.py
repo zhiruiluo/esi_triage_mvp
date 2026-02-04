@@ -50,6 +50,10 @@ class RedFlagDetector:
                 "flags": [],
                 "severity_score": 0.0,
                 "has_red_flags": False,
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "total_tokens": 0,
+                "cost_usd": 0.0,
             }
 
         try:
@@ -65,6 +69,14 @@ class RedFlagDetector:
             )
 
             result = json.loads(response.choices[0].message.content)
+            usage = response.usage or {}
+            prompt_tokens = usage.get("prompt_tokens", 0) or 0
+            completion_tokens = usage.get("completion_tokens", 0) or 0
+            total_tokens = usage.get("total_tokens", 0) or 0
+            cost_usd = (
+                (prompt_tokens / 1000.0) * settings.COST_PER_1K_INPUT
+                + (completion_tokens / 1000.0) * settings.COST_PER_1K_OUTPUT
+            )
 
             flags = result.get("flags_detected", [])
             return {
@@ -74,6 +86,10 @@ class RedFlagDetector:
                 "flags": flags,
                 "severity_score": result.get("severity_score", 0.0),
                 "has_red_flags": result.get("has_red_flags", bool(flags)),
+                "prompt_tokens": prompt_tokens,
+                "completion_tokens": completion_tokens,
+                "total_tokens": total_tokens,
+                "cost_usd": cost_usd,
             }
         except Exception as exc:
             return {
@@ -83,4 +99,8 @@ class RedFlagDetector:
                 "flags": [],
                 "severity_score": 0.0,
                 "has_red_flags": False,
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "total_tokens": 0,
+                "cost_usd": 0.0,
             }

@@ -37,6 +37,7 @@ async def classify(request: Request, payload: ClassifyRequest):
     rate_limiter.increment(client_ip)
 
     result = await detector.classify(payload.case_text)
+    rate_limiter.add_cost(client_ip, result.get("cost_usd", 0.0))
 
     return {
         "esi_level": result["esi"],
@@ -46,6 +47,13 @@ async def classify(request: Request, payload: ClassifyRequest):
             "red_flags": result.get("flags", []),
             "severity": result.get("severity_score", 0.0),
             "has_red_flags": result.get("has_red_flags", False),
+        },
+        "cost": {
+            "prompt_tokens": result.get("prompt_tokens", 0),
+            "completion_tokens": result.get("completion_tokens", 0),
+            "total_tokens": result.get("total_tokens", 0),
+            "estimated_cost_usd": result.get("cost_usd", 0.0),
+            "budget_remaining_usd": rate_limiter.get_remaining_budget(client_ip),
         },
         "queries_remaining": rate_limiter.get_remaining(client_ip),
     }
@@ -64,4 +72,5 @@ async def info():
         "environment": "mvp",
         "model": settings.LLM_MODEL,
         "rate_limit": settings.RATE_LIMIT_PER_DAY,
+        "free_tier_daily_budget_usd": settings.FREE_TIER_DAILY_BUDGET_USD,
     }
