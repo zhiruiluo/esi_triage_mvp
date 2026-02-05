@@ -1,0 +1,74 @@
+{
+  "layer_1_sanity_check": {
+    "layer_name": "Sanity Check",
+    "enabled": false,
+    "knowledge_sources": [],
+    "confidence_threshold": 0.7,
+    "max_results": 0,
+    "use_vector_db": false,
+    "description": "Input validation - no RAG needed"
+  },
+  "layer_2_extraction": {
+    "layer_name": "Extraction",
+    "enabled": true,
+    "knowledge_sources": ["medical_ontology"],
+    "confidence_threshold": 0.8,
+    "max_results": 1,
+    "use_vector_db": false,
+    "description": "Normalize medical terminology and extract structured data"
+  },
+  "layer_3_red_flag_detection": {
+    "layer_name": "Red Flag Detection",
+    "enabled": true,
+    "knowledge_sources": ["esi_handbook", "acs_protocols", "sepsis_criteria", "differential_diagnosis"],
+    "confidence_threshold": 0.85,
+    "max_results": 5,
+    "use_vector_db": false,
+    "description": "Detect ESI-2 criteria using handbook and clinical guidelines"
+  },
+  "layer_4_vital_signal_assessment": {
+    "layer_name": "Vital Signal Assessment",
+    "enabled": true,
+    "knowledge_sources": ["vital_ranges"],
+    "confidence_threshold": 0.9,
+    "max_results": 1,
+    "use_vector_db": false,
+    "description": "Age-aware vital sign interpretation using clinical norms"
+  },
+  "layer_5_resource_inference": {
+    "layer_name": "Resource Inference",
+    "enabled": true,
+    "knowledge_sources": ["esi_handbook", "acs_protocols", "lab_indications"],
+    "confidence_threshold": 0.8,
+    "max_results": 10,
+    "use_vector_db": false,
+    "description": "Infer required resources using clinical protocols"
+  },
+  "layer_6_handbook_verification": {
+    "layer_name": "Handbook Verification",
+    "enabled": true,
+    "knowledge_sources": ["esi_handbook"],
+    "confidence_threshold": 0.85,
+    "max_results": 5,
+    "use_vector_db": false,
+    "description": "Verify ESI decision against official handbook"
+  },
+  "layer_7_final_decision": {
+    "layer_name": "Final Decision",
+    "enabled": true,
+    "knowledge_sources": ["esi_handbook"],
+    "confidence_threshold": 0.75,
+    "max_results": 2,
+    "use_vector_db": false,
+    "description": "Format final ESI decision with handbook reasoning"
+  },
+  "global_settings": {
+    "enable_rag_globally": true,
+    "log_rag_usage": true,
+    "track_rag_accuracy": true,
+    "rag_response_timeout_seconds": 5,
+    "vector_db_enabled": false,
+    "cost_tracking_enabled": true,
+    "debug_mode": false
+  }
+}
