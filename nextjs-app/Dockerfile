@@ -1,11 +1,12 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
+COPY nextjs-app/package.json nextjs-app/package-lock.json* ./
 RUN npm install
 
-COPY . .
+COPY nextjs-app/. .
 RUN npm run build
 
+EXPOSE 3000
 CMD ["npm", "start"]
