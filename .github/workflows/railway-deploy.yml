@@ -8,6 +8,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      RAILWAY_API_KEY: ${{ secrets.RAILWAY_API_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,11 +21,6 @@ jobs:
 
       - name: Install Railway CLI
         run: npm i -g @railway/cli
-
-      - name: Railway Login
-        env:
-          RAILWAY_API_KEY: ${{ secrets.RAILWAY_API_KEY }}
-        run: railway login --apiKey "$RAILWAY_API_KEY"
 
       - name: Link to Railway Project
         env:
