@@ -1,0 +1,72 @@
+name: Deploy to Railway (backend + frontend)
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Railway CLI
+        run: npm i -g @railway/cli
+
+      - name: Railway Login
+        env:
+          RAILWAY_API_KEY: ${{ secrets.RAILWAY_API_KEY }}
+        run: railway login --apiKey "$RAILWAY_API_KEY"
+
+      - name: Link to Railway Project
+        env:
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+        run: railway link --project "$RAILWAY_PROJECT_ID"
+
+      - name: Ensure OPENROUTER_API_KEY present
+        run: |
+          if [ -z "${{ secrets.OPENROUTER_API_KEY }}" ]; then
+            echo "OPENROUTER_API_KEY secret is missing. Set it in repository settings." && exit 1
+          fi
+
+      - name: Deploy backend service
+        run: |
+          railway up --service backend --detach
+        env:
+          RAILWAY_API_KEY: ${{ secrets.RAILWAY_API_KEY }}
+
+      - name: Get backend domain
+        id: backend_domain
+        run: |
+          # Try to read domains via Railway CLI; fall back to parsing output if necessary
+          DOMAIN=$(railway service domains backend | grep http | head -n1 || true)
+          if [ -z "$DOMAIN" ]; then
+            echo "WARN: couldn't find domain via 'railway service domains'. Attempting 'railway status' parse..."
+            DOMAIN=$(railway status --service backend | grep -Eo 'https?://[a-zA-Z0-9.-]+\.railway\.app' | head -n1 || true)
+          fi
+          if [ -z "$DOMAIN" ]; then
+            echo "Could not determine backend domain; set NEXT_PUBLIC_API_URL manually in Railway dashboard." && exit 0
+          fi
+          echo "backend_domain=$DOMAIN" >> $GITHUB_OUTPUT
+        env:
+          RAILWAY_API_KEY: ${{ secrets.RAILWAY_API_KEY }}
+
+      - name: Set frontend environment variable (NEXT_PUBLIC_API_URL)
+        if: steps.backend_domain.outputs.backend_domain != ''
+        run: |
+          railway variables set NEXT_PUBLIC_API_URL "${{ steps.backend_domain.outputs.backend_domain }}" --service frontend
+        env:
+          RAILWAY_API_KEY: ${{ secrets.RAILWAY_API_KEY }}
+
+      - name: Deploy frontend service
+        run: |
+          railway up --service frontend --detach
+        env:
+          RAILWAY_API_KEY: ${{ secrets.RAILWAY_API_KEY }}
