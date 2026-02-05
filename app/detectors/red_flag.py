@@ -69,10 +69,10 @@ class RedFlagDetector:
             )
 
             result = json.loads(response.choices[0].message.content)
-            usage = response.usage or {}
-            prompt_tokens = usage.get("prompt_tokens", 0) or 0
-            completion_tokens = usage.get("completion_tokens", 0) or 0
-            total_tokens = usage.get("total_tokens", 0) or 0
+            usage = response.usage
+            prompt_tokens = usage.prompt_tokens if usage else 0
+            completion_tokens = usage.completion_tokens if usage else 0
+            total_tokens = usage.total_tokens if usage else 0
             cost_usd = (
                 (prompt_tokens / 1000.0) * settings.COST_PER_1K_INPUT
                 + (completion_tokens / 1000.0) * settings.COST_PER_1K_OUTPUT
