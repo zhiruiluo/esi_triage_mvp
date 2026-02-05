@@ -2,10 +2,10 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY nextjs-app/package.json nextjs-app/package-lock.json* ./
+COPY package.json package-lock.json* ./
 RUN npm install --production=false
 
-COPY nextjs-app/ .
+COPY . .
 RUN npm run build
 
 FROM node:20-alpine
