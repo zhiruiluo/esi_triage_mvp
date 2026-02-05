@@ -36,6 +36,14 @@ jobs:
             echo "OPENROUTER_API_KEY secret is missing. Set it in repository settings." && exit 1
           fi
 
+      - name: Set backend variable OPENROUTER_API_KEY
+        run: |
+          railway variables set OPENROUTER_API_KEY "${{ secrets.OPENROUTER_API_KEY }}" --service backend || (
+            echo "Failed to set Railway variable via CLI. You may need to set OPENROUTER_API_KEY in Railway dashboard." && exit 0
+          )
+        env:
+          RAILWAY_API_KEY: ${{ secrets.RAILWAY_API_KEY }}
+
       - name: Deploy backend service
         run: |
           railway up --service backend --detach
