@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 from auth import RateLimiter
 from config import settings
 from detectors.red_flag import RedFlagDetector
+from api.routes import admin_rag
 
 
 class ClassifyRequest(BaseModel):
@@ -74,3 +75,8 @@ async def info():
         "rate_limit": settings.RATE_LIMIT_PER_DAY,
         "free_tier_daily_budget_usd": settings.FREE_TIER_DAILY_BUDGET_USD,
     }
+
+
+# Include admin RAG configuration routes
+app.include_router(admin_rag.router, prefix="/admin", tags=["admin"])
+

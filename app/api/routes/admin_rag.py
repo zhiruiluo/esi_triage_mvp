@@ -3,10 +3,11 @@ Admin API endpoints for RAG layer management.
 Allow runtime configuration of RAG without redeploying.
 """
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from typing import List, Dict, Any
 
 from rag.config import RAGConfigManager
+from auth_admin import verify_admin_key
 
 
 router = APIRouter(prefix="/admin/rag", tags=["admin"])
@@ -16,7 +17,7 @@ config_manager = RAGConfigManager()
 
 
 @router.get("/config")
-async def get_rag_config() -> Dict[str, Any]:
+async def get_rag_config(authenticated: bool = Depends(verify_admin_key)) -> Dict[str, Any]:
     """
     GET /admin/rag/config
     Get current RAG configuration for all layers
@@ -25,7 +26,7 @@ async def get_rag_config() -> Dict[str, Any]:
 
 
 @router.get("/layer/{layer_number}/config")
-async def get_layer_config(layer_number: int) -> Dict[str, Any]:
+async def get_layer_config(layer_number: int, authenticated: bool = Depends(verify_admin_key)) -> Dict[str, Any]:
     """
     GET /admin/rag/layer/{layer_number}/config
     Get configuration for a specific layer
@@ -49,7 +50,7 @@ async def get_layer_config(layer_number: int) -> Dict[str, Any]:
 
 
 @router.post("/layer/{layer_number}/enable")
-async def enable_layer_rag(layer_number: int) -> Dict[str, Any]:
+async def enable_layer_rag(layer_number: int, authenticated: bool = Depends(verify_admin_key)) -> Dict[str, Any]:
     """
     POST /admin/rag/layer/{layer_number}/enable
     Enable RAG for a specific layer
@@ -73,7 +74,7 @@ async def enable_layer_rag(layer_number: int) -> Dict[str, Any]:
 
 
 @router.post("/layer/{layer_number}/disable")
-async def disable_layer_rag(layer_number: int) -> Dict[str, Any]:
+async def disable_layer_rag(layer_number: int, authenticated: bool = Depends(verify_admin_key)) -> Dict[str, Any]:
     """
     POST /admin/rag/layer/{layer_number}/disable
     Disable RAG for a specific layer
@@ -96,7 +97,8 @@ async def disable_layer_rag(layer_number: int) -> Dict[str, Any]:
 @router.post("/layer/{layer_number}/knowledge-sources")
 async def update_knowledge_sources(
     layer_number: int,
-    sources: List[str] = Query(...)
+    sources: List[str] = Query(...),
+    authenticated: bool = Depends(verify_admin_key)
 ) -> Dict[str, Any]:
     """
     POST /admin/rag/layer/{layer_number}/knowledge-sources
@@ -147,7 +149,8 @@ async def update_knowledge_sources(
 @router.post("/layer/{layer_number}/threshold")
 async def set_confidence_threshold(
     layer_number: int,
-    threshold: float = Query(..., ge=0.0, le=1.0)
+    threshold: float = Query(..., ge=0.0, le=1.0),
+    authenticated: bool = Depends(verify_admin_key)
 ) -> Dict[str, Any]:
     """
     POST /admin/rag/layer/{layer_number}/threshold
@@ -169,7 +172,7 @@ async def set_confidence_threshold(
 
 
 @router.post("/toggle-global")
-async def toggle_global_rag(enabled: bool) -> Dict[str, Any]:
+async def toggle_global_rag(enabled: bool, authenticated: bool = Depends(verify_admin_key)) -> Dict[str, Any]:
     """
     POST /admin/rag/toggle-global?enabled=true
     Enable/disable RAG globally (affects all layers)
@@ -186,7 +189,7 @@ async def toggle_global_rag(enabled: bool) -> Dict[str, Any]:
 
 
 @router.post("/reset-defaults")
-async def reset_to_defaults() -> Dict[str, Any]:
+async def reset_to_defaults(authenticated: bool = Depends(verify_admin_key)) -> Dict[str, Any]:
     """
     POST /admin/rag/reset-defaults
     Reset all RAG configuration to defaults (all layers enabled)
@@ -204,7 +207,7 @@ async def reset_to_defaults() -> Dict[str, Any]:
 
 
 @router.get("/stats")
-async def get_rag_stats() -> Dict[str, Any]:
+async def get_rag_stats(authenticated: bool = Depends(verify_admin_key)) -> Dict[str, Any]:
     """
     GET /admin/rag/stats
     Get RAG usage statistics (for monitoring)
