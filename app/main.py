@@ -11,6 +11,7 @@ from detectors.vital_signal import VitalSignalDetector
 from detectors.resource_inference import ResourceInferenceDetector
 from detectors.handbook_verification import HandbookVerificationDetector
 from detectors.final_decision import FinalDecisionDetector
+from llm_router import LLMRouter
 from api.routes import admin_rag
 
 
@@ -34,6 +35,7 @@ vital_detector = VitalSignalDetector()
 resource_detector = ResourceInferenceDetector()
 handbook_detector = HandbookVerificationDetector()
 final_detector = FinalDecisionDetector()
+router = LLMRouter()
 rate_limiter = RateLimiter()
 
 
@@ -48,7 +50,8 @@ async def classify(request: Request, payload: ClassifyRequest):
     rate_limiter.increment(client_ip)
 
     extracted = extraction_detector.extract(payload.case_text)
-    red_flag = await detector.classify(payload.case_text, extracted)
+    red_flag_model = router.select_red_flag_model(payload.case_text, extracted)
+    red_flag = await detector.classify(payload.case_text, extracted, model=red_flag_model)
     vital = await vital_detector.assess(payload.case_text, extracted)
     resources = await resource_detector.infer(payload.case_text, extracted)
 
@@ -85,7 +88,8 @@ async def classify(request: Request, payload: ClassifyRequest):
         "handbook_verification": handbook,
     }
 
-    final_decision = await final_detector.decide(payload.case_text, final_context)
+    final_model = router.select_final_decision_model(payload.case_text, final_context)
+    final_decision = await final_detector.decide(payload.case_text, final_context, model=final_model)
     rate_limiter.add_cost(client_ip, red_flag.get("cost_usd", 0.0))
 
     return {
@@ -101,6 +105,10 @@ async def classify(request: Request, payload: ClassifyRequest):
             "resources": resources,
             "handbook_verification": handbook,
             "final_decision": final_decision,
+            "routing": {
+                "red_flag_model": red_flag.get("model", red_flag_model),
+                "final_decision_model": final_decision.get("model", final_model),
+            },
         },
         "cost": {
             "prompt_tokens": red_flag.get("prompt_tokens", 0) + final_decision.get("prompt_tokens", 0),

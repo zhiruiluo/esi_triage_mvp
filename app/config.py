@@ -15,6 +15,13 @@ class Settings:
     LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
     LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "300"))
 
+    ROUTER_ENABLED = os.getenv("ROUTER_ENABLED", "true").lower() in {"1", "true", "yes"}
+    ROUTER_DEFAULT_MODEL = os.getenv("ROUTER_DEFAULT_MODEL", "gpt-4o-mini")
+    ROUTER_MID_MODEL = os.getenv("ROUTER_MID_MODEL", "gpt-4o")
+    ROUTER_HIGH_MODEL = os.getenv("ROUTER_HIGH_MODEL", "gpt-4-turbo")
+    ROUTER_LOW_CONFIDENCE_THRESHOLD = float(os.getenv("ROUTER_LOW_CONFIDENCE_THRESHOLD", "0.7"))
+    ROUTER_RESOURCE_COUNT_FOR_MID = int(os.getenv("ROUTER_RESOURCE_COUNT_FOR_MID", "2"))
+
     RATE_LIMIT_PER_DAY = int(os.getenv("RATE_LIMIT_PER_DAY", "20"))
     FREE_TIER_DAILY_BUDGET_USD = float(os.getenv("FREE_TIER_DAILY_BUDGET_USD", "1.00"))
     COST_PER_1K_INPUT = float(os.getenv("COST_PER_1K_INPUT", "0.01"))

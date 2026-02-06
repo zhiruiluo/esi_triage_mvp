@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from openai import AsyncOpenAI
 
@@ -100,7 +100,12 @@ class RedFlagDetector:
             "num_results": sum(item.num_results for item in retrievals),
         }
 
-    async def classify(self, case_text: str, extracted: Dict[str, Any] = None) -> Dict[str, Any]:
+    async def classify(
+        self,
+        case_text: str,
+        extracted: Dict[str, Any] = None,
+        model: Optional[str] = None,
+    ) -> Dict[str, Any]:
         if not settings.OPENROUTER_API_KEY:
             return {
                 "esi": 3,
@@ -131,8 +136,9 @@ class RedFlagDetector:
 
             messages.append({"role": "user", "content": f"Case: {case_text}"})
 
+            selected_model = model or settings.LLM_MODEL
             response = await self.client.chat.completions.create(
-                model=settings.LLM_MODEL,
+                model=selected_model,
                 messages=messages,
                 temperature=settings.LLM_TEMPERATURE,
                 max_tokens=settings.LLM_MAX_TOKENS,
@@ -163,6 +169,7 @@ class RedFlagDetector:
                     "queries": rag_info.get("queries", []),
                     "num_results": rag_info.get("num_results", 0),
                 },
+                "model": selected_model,
                 "prompt_tokens": prompt_tokens,
                 "completion_tokens": completion_tokens,
                 "total_tokens": total_tokens,
@@ -182,6 +189,7 @@ class RedFlagDetector:
                     "queries": [],
                     "num_results": 0,
                 },
+                "model": model or settings.LLM_MODEL,
                 "prompt_tokens": 0,
                 "completion_tokens": 0,
                 "total_tokens": 0,

@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from openai import AsyncOpenAI
 
@@ -32,7 +32,12 @@ class FinalDecisionDetector:
         )
         self.rag_config = RAGConfigManager()
 
-    async def decide(self, case_text: str, context: Dict[str, Any]) -> Dict[str, Any]:
+    async def decide(
+        self,
+        case_text: str,
+        context: Dict[str, Any],
+        model: Optional[str] = None,
+    ) -> Dict[str, Any]:
         layer_config = self.rag_config.get_layer_config(7)
         rag_enabled = bool(
             layer_config
@@ -77,8 +82,9 @@ class FinalDecisionDetector:
             }
         )
 
+        selected_model = model or settings.LLM_MODEL
         response = await self.client.chat.completions.create(
-            model=settings.LLM_MODEL,
+            model=selected_model,
             messages=messages,
             temperature=settings.LLM_TEMPERATURE,
             max_tokens=settings.LLM_MAX_TOKENS,
@@ -102,6 +108,7 @@ class FinalDecisionDetector:
             "rag": {
                 "enabled": rag_enabled,
             },
+            "model": selected_model,
             "prompt_tokens": prompt_tokens,
             "completion_tokens": completion_tokens,
             "total_tokens": total_tokens,
