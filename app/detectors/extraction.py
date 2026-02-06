@@ -7,7 +7,7 @@ class ExtractionDetector:
         pass
 
     def _extract_age(self, text: str) -> Optional[int]:
-        match = re.search(r"(\d{1,3})\s*(?:years?|yo|y/o|yr)\b", text.lower())
+        match = re.search(r"(\d{1,3})[-\s]*(?:years?|year-old|yo|y/o|yr)\b", text.lower())
         if match:
             return int(match.group(1))
         return None
