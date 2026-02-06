@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from typing import Optional
+import re
 
 from pydantic import BaseModel, Field
 
@@ -101,7 +102,15 @@ async def classify(request: Request, payload: ClassifyRequest):
     final_decision = await final_detector.decide(payload.case_text, final_context, model=final_model)
     rate_limiter.add_cost(client_ip, red_flag.get("cost_usd", 0.0))
 
-    final_esi_level = final_decision.get("esi", preliminary_esi)
+    final_esi_level_raw = final_decision.get("esi", preliminary_esi)
+    if isinstance(final_esi_level_raw, int):
+        final_esi_level = final_esi_level_raw
+    elif isinstance(final_esi_level_raw, str):
+        match = re.search(r"\d", final_esi_level_raw)
+        final_esi_level = int(match.group()) if match else preliminary_esi
+    else:
+        final_esi_level = preliminary_esi
+
     handbook = await handbook_detector.verify(final_esi_level, payload.case_text)
     final_context["handbook_verification"] = handbook
 
@@ -115,7 +124,7 @@ async def classify(request: Request, payload: ClassifyRequest):
     total_cost = sum(layer_costs.values())
 
     return {
-        "esi_level": final_decision.get("esi", preliminary_esi),
+        "esi_level": final_esi_level,
         "confidence": final_decision.get("confidence", 0.6),
         "reason": final_decision.get("reason", preliminary_reason),
         "intermediate": {
