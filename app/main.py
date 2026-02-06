@@ -85,8 +85,6 @@ async def classify(request: Request, payload: ClassifyRequest):
         preliminary_esi = min(preliminary_esi, 2)
         preliminary_reason = "Critical vital signs"
 
-    handbook = await handbook_detector.verify(preliminary_esi, payload.case_text)
-
     final_context = {
         "esi_level": preliminary_esi,
         "preliminary_reason": preliminary_reason,
@@ -94,7 +92,6 @@ async def classify(request: Request, payload: ClassifyRequest):
         "red_flags": red_flag,
         "vitals": vital,
         "resources": resources,
-        "handbook_verification": handbook,
     }
 
     final_model = (
@@ -103,6 +100,10 @@ async def classify(request: Request, payload: ClassifyRequest):
     )
     final_decision = await final_detector.decide(payload.case_text, final_context, model=final_model)
     rate_limiter.add_cost(client_ip, red_flag.get("cost_usd", 0.0))
+
+    final_esi_level = final_decision.get("esi", preliminary_esi)
+    handbook = await handbook_detector.verify(final_esi_level, payload.case_text)
+    final_context["handbook_verification"] = handbook
 
     layer_costs = {
         "red_flag": float(red_flag.get("cost_usd", 0.0) or 0.0),
