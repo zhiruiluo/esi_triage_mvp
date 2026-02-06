@@ -8,7 +8,6 @@ import os
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 
-import numpy as np
 from openai import AsyncOpenAI
 
 # For vector similarity (will integrate with Pinecone/Weaviate in production)
