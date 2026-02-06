@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from 'react';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  'http://localhost:8000';
 
 interface LayerConfig {
   name: string;
@@ -200,9 +203,6 @@ export default function AdminDashboard() {
           >
             Login
           </button>
-          <p className="mt-4 text-xs text-gray-500">
-            Default API key for development: <code className="bg-gray-100 px-1 rounded">admin123</code>
-          </p>
         </div>
       </div>
     );
