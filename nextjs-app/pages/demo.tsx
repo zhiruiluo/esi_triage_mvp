@@ -379,13 +379,14 @@ export default function DemoPage() {
                 {Object.entries(result.intermediate?.vitals?.vitals || {}).length === 0 && (
                   <span>No vitals extracted.</span>
                 )}
-                {Object.entries(result.intermediate?.vitals?.vitals || {}).map(
-                  ([key, value]) => (
+                {Object.entries(
+                  result.intermediate?.vitals?.vitals || {}
+                ).map(([key, value]) => (
                     <div key={key}>
                       <strong style={{ color: "#0f172a" }}>
                         {vitalsLabelMap[key] || key}
                       </strong>
-                      : {value}
+                      : {String(value)}
                       <span style={{ color: "#94a3b8" }}>
                         {" "}· Typical range {vitalsRangeByAge(result.intermediate?.extraction?.age)[key] || "n/a"}
                       </span>
