@@ -11,73 +11,73 @@ type SampleCase = {
 
 const SAMPLE_CASES: SampleCase[] = [
   {
-    id: "esi1-airway",
+    id: "esi1-mastitis",
     esi: 1,
-    title: "Severe respiratory distress",
-    text: "70-year-old with severe shortness of breath, cyanosis, SpO2 82%, RR 34. Using accessory muscles.",
-    expectedDecision: "ESI-1: immediate life-saving intervention likely needed.",
+    title: "Postpartum fever and breast pain",
+    text: "“My right breast is so sore, my nipples are cracked, and now I have a fever. Do you think I will have to stop nursing my baby?” asks a tearful postpartum patient.",
+    expectedDecision: "ESI-1: immediate life-saving intervention required.",
   },
   {
-    id: "esi1-shock",
+    id: "esi1-sah",
     esi: 1,
-    title: "Hemodynamic shock",
-    text: "46-year-old with massive GI bleed, SBP 78, HR 132, altered mental status.",
-    expectedDecision: "ESI-1: shock/unstable vitals.",
+    title: "Sudden severe headache",
+    text: "26-year-old female is transported by EMS to the ED because she experienced the sudden onset of a severe headache that began after she moved.",
+    expectedDecision: "ESI-1: immediate life-saving intervention required.",
   },
   {
-    id: "esi2-chest",
+    id: "esi2-sob",
     esi: 2,
-    title: "Chest pain with red flags",
-    text: "58-year-old with crushing chest pain radiating to left arm, diaphoretic. BP 160/95, HR 98.",
-    expectedDecision: "ESI-2: high-risk chest pain.",
+    title: "Shortness of breath",
+    text: "A 32-year-old female presents to the emergency department complaining of shortness of breath for several hours. No past medical history, +smoker.",
+    expectedDecision: "ESI-2: high risk.",
   },
   {
-    id: "esi2-ams",
+    id: "esi2-warfarin-fall",
     esi: 2,
-    title: "Altered mental status",
-    text: "32-year-old found confused and disoriented, vomiting, family reports sudden onset.",
-    expectedDecision: "ESI-2: altered mental status.",
+    title: "Elderly fall on warfarin",
+    text: "EMS arrives with an 87-year-old male who fell and hit his head. He is awake, alert, and oriented and remembers the fall. He has a past medical history of atrial fibrillation and takes warfarin.",
+    expectedDecision: "ESI-2: high risk due to anticoagulation.",
   },
   {
-    id: "esi3-abd",
+    id: "esi3-bike-accident",
     esi: 3,
-    title: "Abdominal pain, multiple resources",
-    text: "25-year-old with severe abdominal pain, fever 101.8F. Needs labs and CT abdomen.",
-    expectedDecision: "ESI-3: stable but 2+ resources.",
+    title: "Bike accident with laceration",
+    text: "A 41-year-old male involved in a bicycle accident walks into the emergency department with his right arm in a sling. He fell off his bike and landed on his right arm. He has pain in the wrist and a 2-centimeter laceration on his left elbow.",
+    expectedDecision: "ESI-3: two or more resources.",
   },
   {
-    id: "esi3-sob",
+    id: "esi3-foot-infection",
     esi: 3,
-    title: "SOB, stable vitals",
-    text: "40-year-old with shortness of breath, SpO2 94%, RR 22, CXR and labs ordered.",
-    expectedDecision: "ESI-3: stable, multiple resources.",
-  },
-  {
-    id: "esi4-lac",
-    esi: 4,
-    title: "Simple laceration",
-    text: "29-year-old with 2 cm finger laceration, bleeding controlled, vitals normal. Needs sutures.",
-    expectedDecision: "ESI-4: one resource.",
+    title: "Swollen painful foot",
+    text: "A 60-year-old man requests to see a doctor because his right foot hurts. The great toe and foot skin are red, warm, swollen, and tender.",
+    expectedDecision: "ESI-3: two or more resources.",
   },
   {
     id: "esi4-uti",
     esi: 4,
     title: "UTI symptoms",
-    text: "52-year-old with dysuria and frequency, no fever, vitals normal. Needs urinalysis.",
+    text: "A 52-year-old female requests to see a doctor for a possible urinary tract infection (UTI). She is complaining of dysuria and frequency.",
     expectedDecision: "ESI-4: one resource.",
   },
   {
-    id: "esi5-rx",
+    id: "esi4-dysuria",
+    esi: 4,
+    title: "Dysuria without fever",
+    text: "“It hurts so much when I urinate,” reports an otherwise healthy 25-year-old. She denies fever, chills, abdominal pain, or vaginal discharge.",
+    expectedDecision: "ESI-4: one resource.",
+  },
+  {
+    id: "esi5-refill",
     esi: 5,
     title: "Medication refill",
-    text: "56-year-old requests blood pressure medication refill, no acute complaints, vitals normal.",
+    text: "“I ran out of my blood pressure medicine, and my doctor is on vacation. Can someone here write me a prescription?” requests a 56-year-old male with a history of HTN. Vital signs: BP 128/84, HR 76, RR 16, T 97˚F.",
     expectedDecision: "ESI-5: no resources.",
   },
   {
-    id: "esi5-tooth",
+    id: "esi5-pain-refill",
     esi: 5,
-    title: "Toothache",
-    text: "40-year-old with toothache, no fever or swelling, just wants pain control.",
+    title: "Pain medication refill",
+    text: "“I just need another prescription for pain medication. I was here 10 days ago and ran out,” a 27-year-old male tells you. “I hurt my back at work.”",
     expectedDecision: "ESI-5: no resources.",
   },
 ];
@@ -356,6 +356,30 @@ export default function DemoPage() {
               marginTop: "1rem",
             }}
           >
+            <div style={{ background: "#f8fafc", borderRadius: 12, padding: "0.75rem" }}>
+              <strong>Cost breakdown</strong>
+              <div style={{ color: "#475569", display: "grid", gap: "0.35rem" }}>
+                <div>
+                  Red-flag layer: ${Number(result.intermediate?.red_flags?.cost_usd || 0).toFixed(4)}
+                </div>
+                <div>
+                  Vitals layer: ${Number(result.intermediate?.vitals?.cost_usd || 0).toFixed(4)}
+                </div>
+                <div>
+                  Resources layer: ${Number(result.intermediate?.resources?.cost_usd || 0).toFixed(4)}
+                </div>
+                <div>
+                  Handbook layer: ${Number(result.intermediate?.handbook_verification?.cost_usd || 0).toFixed(4)}
+                </div>
+                <div>
+                  Final decision: ${Number(result.intermediate?.final_decision?.cost_usd || 0).toFixed(4)}
+                </div>
+                <div style={{ marginTop: "0.25rem", color: "#0f172a" }}>
+                  Total: ${Number(result.cost?.estimated_cost_usd || 0).toFixed(4)}
+                </div>
+              </div>
+            </div>
+
             <div style={{ background: "#f8fafc", borderRadius: 12, padding: "0.75rem" }}>
               <strong>Red flags</strong>
               <p style={{ margin: "0.25rem 0" }}>
