@@ -54,7 +54,7 @@ class RedFlagDetector:
             return "Altered Mental Status"
         return "General"
 
-    async def _build_rag_context(self, case_text: str) -> Dict[str, Any]:
+    async def _build_rag_context(self, case_text: str, extracted: Dict[str, Any] = None) -> Dict[str, Any]:
         layer_config = self.rag_config.get_layer_config(3)
         if not layer_config:
             return {"enabled": False, "context": "", "sources": [], "queries": []}
@@ -73,7 +73,7 @@ class RedFlagDetector:
             }
         )
 
-        chief_complaint = self._extract_chief_complaint(case_text)
+        chief_complaint = extracted.get("chief_complaint") if extracted else self._extract_chief_complaint(case_text)
         retrievals: List[RetrievalResult] = []
 
         if "esi_handbook" in layer_config.knowledge_sources:
@@ -100,7 +100,7 @@ class RedFlagDetector:
             "num_results": sum(item.num_results for item in retrievals),
         }
 
-    async def classify(self, case_text: str) -> Dict[str, Any]:
+    async def classify(self, case_text: str, extracted: Dict[str, Any] = None) -> Dict[str, Any]:
         if not settings.OPENROUTER_API_KEY:
             return {
                 "esi": 3,
@@ -116,7 +116,7 @@ class RedFlagDetector:
             }
 
         try:
-            rag_info = await self._build_rag_context(case_text)
+            rag_info = await self._build_rag_context(case_text, extracted)
             messages = [
                 {"role": "system", "content": SYSTEM_PROMPT},
             ]

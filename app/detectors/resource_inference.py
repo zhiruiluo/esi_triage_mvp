@@ -40,8 +40,13 @@ class ResourceInferenceDetector:
                 deduped.append(res)
         return deduped
 
-    async def infer(self, case_text: str) -> Dict[str, Any]:
-        resources = self._infer_resources(case_text)
+    async def infer(self, case_text: str, extracted: Dict[str, Any] = None) -> Dict[str, Any]:
+        text = case_text
+        if extracted:
+            keywords = extracted.get("keywords", [])
+            if keywords:
+                text = " ".join(keywords)
+        resources = self._infer_resources(text)
         resource_count = len(resources)
 
         layer_config = self.rag_config.get_layer_config(5)

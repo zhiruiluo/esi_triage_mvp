@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 from auth import RateLimiter
 from config import settings
 from detectors.red_flag import RedFlagDetector
+from detectors.extraction import ExtractionDetector
 from detectors.vital_signal import VitalSignalDetector
 from detectors.resource_inference import ResourceInferenceDetector
 from detectors.handbook_verification import HandbookVerificationDetector
@@ -27,6 +28,7 @@ app.add_middleware(
 )
 
 detector = RedFlagDetector()
+extraction_detector = ExtractionDetector()
 vital_detector = VitalSignalDetector()
 resource_detector = ResourceInferenceDetector()
 handbook_detector = HandbookVerificationDetector()
@@ -43,9 +45,10 @@ async def classify(request: Request, payload: ClassifyRequest):
 
     rate_limiter.increment(client_ip)
 
-    red_flag = await detector.classify(payload.case_text)
-    vital = await vital_detector.assess(payload.case_text)
-    resources = await resource_detector.infer(payload.case_text)
+    extracted = extraction_detector.extract(payload.case_text)
+    red_flag = await detector.classify(payload.case_text, extracted)
+    vital = await vital_detector.assess(payload.case_text, extracted)
+    resources = await resource_detector.infer(payload.case_text, extracted)
 
     # Simple pipeline logic (temporary until full multi-layer orchestration)
     if red_flag.get("has_red_flags"):
@@ -79,6 +82,7 @@ async def classify(request: Request, payload: ClassifyRequest):
         "confidence": confidence,
         "reason": reason,
         "intermediate": {
+            "extraction": extracted,
             "red_flags": red_flag.get("flags", []),
             "severity": red_flag.get("severity_score", 0.0),
             "has_red_flags": red_flag.get("has_red_flags", False),

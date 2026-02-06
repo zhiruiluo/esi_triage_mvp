@@ -67,9 +67,9 @@ class VitalSignalDetector:
             return True
         return False
 
-    async def assess(self, case_text: str) -> Dict[str, Any]:
-        age = self._extract_age(case_text)
-        vitals = self._extract_vitals(case_text)
+    async def assess(self, case_text: str, extracted: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        age = extracted.get("age") if extracted else self._extract_age(case_text)
+        vitals = extracted.get("vitals") if extracted else self._extract_vitals(case_text)
 
         layer_config = self.rag_config.get_layer_config(4)
         rag_enabled = bool(
