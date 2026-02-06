@@ -580,6 +580,30 @@ export default function DemoPage() {
             </div>
 
             <div style={{ background: "#f8fafc", borderRadius: 14, padding: "0.9rem" }}>
+              <strong>Malicious input</strong>
+              <p style={{ margin: "0.25rem 0" }}>
+                Detected: {result.intermediate?.malicious_input?.is_malicious ? "Yes" : "No"}
+              </p>
+              {result.intermediate?.malicious_input?.is_malicious && (
+                <details style={{ marginTop: "0.5rem" }}>
+                  <summary style={{ cursor: "pointer", color: "#475569" }}>
+                    Detection details
+                  </summary>
+                  <pre
+                    style={{
+                      marginTop: "0.5rem",
+                      whiteSpace: "pre-wrap",
+                      fontSize: "0.8rem",
+                      color: "#475569",
+                    }}
+                  >
+                    {JSON.stringify(result.intermediate?.malicious_input || {}, null, 2)}
+                  </pre>
+                </details>
+              )}
+            </div>
+
+            <div style={{ background: "#f8fafc", borderRadius: 14, padding: "0.9rem" }}>
               <strong>Model routing</strong>
               <p style={{ margin: "0.25rem 0" }}>
                 Mode: {result.intermediate?.routing?.mode || "auto"}
