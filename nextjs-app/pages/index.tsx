@@ -11,6 +11,27 @@ export default function Home() {
         color: "#0f172a",
       }}
     >
+      <nav
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "2rem",
+        }}
+      >
+        <strong>ESI Triage</strong>
+        <div style={{ display: "flex", gap: "1rem" }}>
+          <Link href="/" style={{ textDecoration: "none", color: "#0f172a" }}>
+            Home
+          </Link>
+          <Link href="/demo" style={{ textDecoration: "none", color: "#0f172a" }}>
+            Demo
+          </Link>
+          <Link href="/admin" style={{ textDecoration: "none", color: "#0f172a" }}>
+            Admin
+          </Link>
+        </div>
+      </nav>
       <header style={{ marginBottom: "2rem" }}>
         <p style={{ color: "#6366f1", fontWeight: 600, letterSpacing: "0.08em" }}>
           AI TRIAGE ASSISTANT

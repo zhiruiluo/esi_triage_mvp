@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 type SampleCase = {
@@ -189,6 +190,28 @@ export default function DemoPage() {
         color: "#0f172a",
       }}
     >
+      <nav
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "1.5rem",
+        }}
+      >
+        <strong>ESI Triage</strong>
+        <div style={{ display: "flex", gap: "1rem" }}>
+          <Link href="/" style={{ textDecoration: "none", color: "#0f172a" }}>
+            Home
+          </Link>
+          <Link href="/demo" style={{ textDecoration: "none", color: "#0f172a" }}>
+            Demo
+          </Link>
+          <Link href="/admin" style={{ textDecoration: "none", color: "#0f172a" }}>
+            Admin
+          </Link>
+        </div>
+      </nav>
+
       <header style={{ marginBottom: "1.5rem" }}>
         <h1 style={{ fontSize: "2rem", marginBottom: "0.25rem" }}>
           ESI Triage Demo
