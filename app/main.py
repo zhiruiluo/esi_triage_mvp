@@ -11,7 +11,8 @@ from config import settings
 from detectors.red_flag import RedFlagDetector
 from detectors.extraction import ExtractionDetector
 from detectors.vital_signal import VitalSignalDetector
-from detectors.malicious_input import MaliciousInputDetector
+import asyncio
+from detectors.malicious_input import MaliciousInputDetector, LLMMaliciousInputDetector
 from detectors.resource_inference import ResourceInferenceDetector
 from detectors.handbook_verification import HandbookVerificationDetector
 from detectors.final_decision import FinalDecisionDetector
@@ -46,6 +47,7 @@ final_detector = FinalDecisionDetector()
 router = LLMRouter()
 rate_limiter = RateLimiter()
 malicious_detector = MaliciousInputDetector()
+malicious_llm_detector = LLMMaliciousInputDetector()
 
 
 @app.post("/classify")
@@ -58,8 +60,23 @@ async def classify(request: Request, payload: ClassifyRequest):
 
     rate_limiter.increment(client_ip)
 
-    malicious_check = malicious_detector.analyze(payload.case_text)
+    malicious_check, malicious_llm_check = await asyncio.gather(
+        asyncio.to_thread(malicious_detector.analyze, payload.case_text),
+        malicious_llm_detector.analyze(payload.case_text),
+    )
     sanitized_case_text = malicious_check.get("sanitized_text") or payload.case_text
+
+    if malicious_llm_check.get("enabled") and malicious_llm_check.get("is_malicious"):
+        if malicious_llm_check.get("can_sanitize") and malicious_llm_check.get("sanitized_text"):
+            sanitized_case_text = malicious_llm_check["sanitized_text"]
+        else:
+            return JSONResponse(
+                {
+                    "error": "Potential prompt injection detected. Please remove instruction-like content and resubmit.",
+                    "malicious_input": {**malicious_check, "llm": malicious_llm_check},
+                },
+                status_code=400,
+            )
 
     extracted = extraction_detector.extract(sanitized_case_text)
     model_override = payload.model if payload.model and payload.model != "auto" else None
@@ -140,7 +157,10 @@ async def classify(request: Request, payload: ClassifyRequest):
             "has_red_flags": red_flag.get("has_red_flags", False),
             "vitals": vital,
             "resources": resources,
-            "malicious_input": malicious_check,
+            "malicious_input": {
+                **malicious_check,
+                "llm": malicious_llm_check,
+            },
             "handbook_verification": handbook,
             "final_decision": final_decision,
             "routing": {
