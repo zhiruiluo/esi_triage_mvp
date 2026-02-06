@@ -184,13 +184,13 @@ export default function DemoPage() {
   return (
     <div
       style={{
-        fontFamily: "system-ui",
-        padding: "2rem",
-        maxWidth: 1100,
-        margin: "0 auto",
+        fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+        background: "#f8fafc",
         color: "#0f172a",
+        minHeight: "100vh",
       }}
     >
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "2rem 1.75rem 3rem" }}>
       <nav
         style={{
           display: "flex",
@@ -199,7 +199,26 @@ export default function DemoPage() {
           marginBottom: "1.5rem",
         }}
       >
-        <strong>ESI Triage</strong>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 10,
+              background: "linear-gradient(135deg, #2563eb, #0ea5e9)",
+              color: "white",
+              display: "grid",
+              placeItems: "center",
+              fontWeight: 700,
+            }}
+          >
+            ESI
+          </div>
+          <div>
+            <strong style={{ fontSize: "1.05rem" }}>ESI Triage</strong>
+            <div style={{ color: "#64748b", fontSize: "0.85rem" }}>Clinical demo</div>
+          </div>
+        </div>
         <div style={{ display: "flex", gap: "1rem" }}>
           <Link href="/" style={{ textDecoration: "none", color: "#0f172a" }}>
             Home
@@ -213,7 +232,16 @@ export default function DemoPage() {
         </div>
       </nav>
 
-      <header style={{ marginBottom: "1.5rem" }}>
+      <header
+        style={{
+          marginBottom: "1.5rem",
+          background: "white",
+          border: "1px solid #e2e8f0",
+          borderRadius: 18,
+          padding: "1.75rem",
+          boxShadow: "0 12px 30px rgba(15, 23, 42, 0.06)",
+        }}
+      >
         <h1 style={{ fontSize: "2rem", marginBottom: "0.25rem" }}>
           ESI Triage Demo
         </h1>
@@ -230,10 +258,11 @@ export default function DemoPage() {
             <div
               key={esi}
               style={{
-                background: "#f8fafc",
+                background: "white",
                 border: "1px solid #e2e8f0",
-                borderRadius: 12,
-                padding: "0.75rem",
+                borderRadius: 16,
+                padding: "0.85rem",
+                boxShadow: "0 8px 20px rgba(15, 23, 42, 0.05)",
               }}
             >
               <strong style={{ display: "block", marginBottom: "0.5rem" }}>ESI-{esi}</strong>
@@ -251,7 +280,7 @@ export default function DemoPage() {
                       padding: "0.5rem 0.75rem",
                       borderRadius: 999,
                       border: "1px solid #cbd5f5",
-                      background: selectedSample?.id === sample.id ? "#e0e7ff" : "white",
+                      background: selectedSample?.id === sample.id ? "#e0f2fe" : "white",
                       cursor: "pointer",
                     }}
                   >
@@ -272,7 +301,14 @@ export default function DemoPage() {
             onChange={(e) => setCaseText(e.target.value)}
             placeholder="Example: 58-year-old with chest pain and shortness of breath..."
             rows={7}
-            style={{ width: "100%", padding: "0.75rem", marginBottom: "0.75rem" }}
+            style={{
+              width: "100%",
+              padding: "0.75rem",
+              marginBottom: "0.75rem",
+              borderRadius: 12,
+              border: "1px solid #cbd5f5",
+              background: "white",
+            }}
           />
 
           {selectedSample?.expectedDecision && (
@@ -287,7 +323,12 @@ export default function DemoPage() {
               <select
                 value={modelChoice}
                 onChange={(e) => setModelChoice(e.target.value)}
-                style={{ padding: "0.5rem", borderRadius: 8, border: "1px solid #cbd5f5" }}
+                style={{
+                  padding: "0.5rem",
+                  borderRadius: 10,
+                  border: "1px solid #cbd5f5",
+                  background: "white",
+                }}
               >
                 <option value="auto">Auto (smart routing)</option>
                 <option value="gpt-4-turbo">gpt-4-turbo</option>
@@ -297,7 +338,19 @@ export default function DemoPage() {
                 <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
               </select>
             </label>
-            <button onClick={handleClassify} disabled={loading}>
+            <button
+              onClick={handleClassify}
+              disabled={loading}
+              style={{
+                padding: "0.6rem 1.25rem",
+                borderRadius: 999,
+                border: "none",
+                background: "#2563eb",
+                color: "white",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
               {loading ? "Classifying..." : "Classify"}
             </button>
             <button
@@ -308,6 +361,15 @@ export default function DemoPage() {
                 setError("");
               }}
               disabled={loading}
+              style={{
+                padding: "0.6rem 1.25rem",
+                borderRadius: 999,
+                border: "1px solid #cbd5f5",
+                background: "white",
+                color: "#0f172a",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
             >
               Clear
             </button>
@@ -318,10 +380,11 @@ export default function DemoPage() {
 
         <div
           style={{
-            background: "#f1f5f9",
+            background: "white",
             border: "1px solid #e2e8f0",
-            borderRadius: 12,
-            padding: "1rem",
+            borderRadius: 16,
+            padding: "1.25rem",
+            boxShadow: "0 10px 24px rgba(15, 23, 42, 0.05)",
           }}
         >
           <h3 style={{ marginTop: 0 }}>What builds trust?</h3>
@@ -340,11 +403,11 @@ export default function DemoPage() {
         <section
           style={{
             marginTop: "2rem",
-            background: "#ffffff",
+            background: "white",
             border: "1px solid #e2e8f0",
-            borderRadius: 16,
-            padding: "1.5rem",
-            boxShadow: "0 10px 30px rgba(15, 23, 42, 0.05)",
+            borderRadius: 20,
+            padding: "1.75rem",
+            boxShadow: "0 16px 36px rgba(15, 23, 42, 0.08)",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap" }}>
@@ -372,7 +435,7 @@ export default function DemoPage() {
               marginTop: "1rem",
             }}
           >
-            <div style={{ background: "#f8fafc", borderRadius: 12, padding: "0.75rem" }}>
+            <div style={{ background: "#f8fafc", borderRadius: 14, padding: "0.9rem" }}>
               <strong>Cost breakdown</strong>
               <div style={{ color: "#475569", display: "grid", gap: "0.35rem" }}>
                 <div>
@@ -396,7 +459,7 @@ export default function DemoPage() {
               </div>
             </div>
 
-            <div style={{ background: "#f8fafc", borderRadius: 12, padding: "0.75rem" }}>
+            <div style={{ background: "#f8fafc", borderRadius: 14, padding: "0.9rem" }}>
               <strong>Red flags</strong>
               <p style={{ margin: "0.25rem 0" }}>
                 {result.intermediate?.has_red_flags ? "Detected" : "None"}
@@ -410,7 +473,7 @@ export default function DemoPage() {
               )}
             </div>
 
-            <div style={{ background: "#f8fafc", borderRadius: 12, padding: "0.75rem" }}>
+            <div style={{ background: "#f8fafc", borderRadius: 14, padding: "0.9rem" }}>
               <strong>Vitals</strong>
               <p style={{ margin: "0.25rem 0" }}>
                 Vitals Critical: {result.intermediate?.vitals?.critical ? "Yes" : "No"}
@@ -436,7 +499,7 @@ export default function DemoPage() {
               </div>
             </div>
 
-            <div style={{ background: "#f8fafc", borderRadius: 12, padding: "0.75rem" }}>
+            <div style={{ background: "#f8fafc", borderRadius: 14, padding: "0.9rem" }}>
               <strong>Resources</strong>
               <p style={{ margin: "0.25rem 0" }}>
                 Count: {result.intermediate?.resources?.resource_count ?? 0}
@@ -458,7 +521,7 @@ export default function DemoPage() {
               </div>
             </div>
 
-            <div style={{ background: "#f8fafc", borderRadius: 12, padding: "0.75rem" }}>
+            <div style={{ background: "#f8fafc", borderRadius: 14, padding: "0.9rem" }}>
               <strong>Handbook check</strong>
               <p style={{ margin: "0.25rem 0" }}>
                 Confidence: {result.intermediate?.handbook_verification?.confidence ?? "n/a"}
@@ -468,7 +531,7 @@ export default function DemoPage() {
               </pre>
             </div>
 
-            <div style={{ background: "#f8fafc", borderRadius: 12, padding: "0.75rem" }}>
+            <div style={{ background: "#f8fafc", borderRadius: 14, padding: "0.9rem" }}>
               <strong>Model routing</strong>
               <p style={{ margin: "0.25rem 0" }}>
                 Mode: {result.intermediate?.routing?.mode || "auto"}
@@ -483,6 +546,7 @@ export default function DemoPage() {
           </div>
         </section>
       )}
+      </div>
     </div>
   );
 }
