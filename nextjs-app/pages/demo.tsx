@@ -11,10 +11,10 @@ type SampleCase = {
 
 const SAMPLE_CASES: SampleCase[] = [
   {
-    id: "esi1-mastitis",
+    id: "esi1-gunshot-chest",
     esi: 1,
-    title: "Postpartum fever and breast pain",
-    text: "“My right breast is so sore, my nipples are cracked, and now I have a fever. Do you think I will have to stop nursing my baby?” asks a tearful postpartum patient. She is 3 months post partum and has recently returned to work part- time. Vital signs: T 102.8˚F, HR 90, RR 18, BP 108/60, pain 5/10. No past medical history, taking multivitamins, and is allergic to penicillin.",
+    title: "Gunshot wound to the left chest",
+    text: "EMS radios in that they are in route with a 21- year-old with a single gunshot wound to the left chest. Vital signs are BP 78/palp, HR 148, RR 36, SpO2 96% on a non-rebreather.",
     expectedDecision: "ESI-1: immediate life-saving intervention required.",
   },
   {
