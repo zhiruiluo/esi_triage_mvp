@@ -11,6 +11,7 @@ from config import settings
 from detectors.red_flag import RedFlagDetector
 from detectors.extraction import ExtractionDetector
 from detectors.vital_signal import VitalSignalDetector
+from detectors.malicious_input import MaliciousInputDetector
 from detectors.resource_inference import ResourceInferenceDetector
 from detectors.handbook_verification import HandbookVerificationDetector
 from detectors.final_decision import FinalDecisionDetector
@@ -44,6 +45,7 @@ handbook_detector = HandbookVerificationDetector()
 final_detector = FinalDecisionDetector()
 router = LLMRouter()
 rate_limiter = RateLimiter()
+malicious_detector = MaliciousInputDetector()
 
 
 @app.post("/classify")
@@ -56,14 +58,17 @@ async def classify(request: Request, payload: ClassifyRequest):
 
     rate_limiter.increment(client_ip)
 
-    extracted = extraction_detector.extract(payload.case_text)
+    malicious_check = malicious_detector.analyze(payload.case_text)
+    sanitized_case_text = malicious_check.get("sanitized_text") or payload.case_text
+
+    extracted = extraction_detector.extract(sanitized_case_text)
     model_override = payload.model if payload.model and payload.model != "auto" else None
     red_flag_model = (
-        model_override or router.select_red_flag_model(payload.case_text, extracted)
+        model_override or router.select_red_flag_model(sanitized_case_text, extracted)
     )
-    red_flag = await detector.classify(payload.case_text, extracted, model=red_flag_model)
-    vital = await vital_detector.assess(payload.case_text, extracted)
-    resources = await resource_detector.infer(payload.case_text, extracted)
+    red_flag = await detector.classify(sanitized_case_text, extracted, model=red_flag_model)
+    vital = await vital_detector.assess(sanitized_case_text, extracted)
+    resources = await resource_detector.infer(sanitized_case_text, extracted)
 
     # Simple pipeline logic (temporary scoring passed into LLM final decision)
     if red_flag.get("has_red_flags"):
@@ -97,9 +102,9 @@ async def classify(request: Request, payload: ClassifyRequest):
 
     final_model = (
         model_override
-        or router.select_final_decision_model(payload.case_text, final_context)
+        or router.select_final_decision_model(sanitized_case_text, final_context)
     )
-    final_decision = await final_detector.decide(payload.case_text, final_context, model=final_model)
+    final_decision = await final_detector.decide(sanitized_case_text, final_context, model=final_model)
     rate_limiter.add_cost(client_ip, red_flag.get("cost_usd", 0.0))
 
     final_esi_level_raw = final_decision.get("esi", preliminary_esi)
@@ -111,7 +116,7 @@ async def classify(request: Request, payload: ClassifyRequest):
     else:
         final_esi_level = preliminary_esi
 
-    handbook = await handbook_detector.verify(final_esi_level, payload.case_text)
+    handbook = await handbook_detector.verify(final_esi_level, sanitized_case_text)
     final_context["handbook_verification"] = handbook
 
     layer_costs = {
@@ -135,6 +140,7 @@ async def classify(request: Request, payload: ClassifyRequest):
             "has_red_flags": red_flag.get("has_red_flags", False),
             "vitals": vital,
             "resources": resources,
+            "malicious_input": malicious_check,
             "handbook_verification": handbook,
             "final_decision": final_decision,
             "routing": {
