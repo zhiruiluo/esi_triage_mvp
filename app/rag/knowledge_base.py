@@ -428,6 +428,32 @@ class KnowledgeBase:
             num_results=len(results),
             confidence_scores=[0.88] * len(results)
         )
+
+    async def retrieve_acs_protocols(self, condition: Optional[str] = None) -> RetrievalResult:
+        """Retrieve ACS protocols and risk scores"""
+        results = self.knowledge_docs["acs_protocols"]
+        query = f"ACS protocols{f' for {condition}' if condition else ''}"
+
+        return RetrievalResult(
+            query=query,
+            collection="acs_protocols",
+            results=results[:3],
+            num_results=len(results),
+            confidence_scores=[0.9] * len(results[:3])
+        )
+
+    async def retrieve_sepsis_criteria(self, condition: Optional[str] = None) -> RetrievalResult:
+        """Retrieve sepsis criteria and workup guidelines"""
+        results = self.knowledge_docs["sepsis_criteria"]
+        query = f"Sepsis criteria{f' for {condition}' if condition else ''}"
+
+        return RetrievalResult(
+            query=query,
+            collection="sepsis_criteria",
+            results=results[:3],
+            num_results=len(results),
+            confidence_scores=[0.9] * len(results[:3])
+        )
     
     def _get_age_group(self, age: int, population: str) -> str:
         """Determine age group classification"""
