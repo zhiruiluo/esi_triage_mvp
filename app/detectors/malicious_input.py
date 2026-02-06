@@ -101,6 +101,14 @@ class LLMMaliciousInputDetector:
         )
 
         result = json.loads(response.choices[0].message.content)
+        usage = response.usage
+        prompt_tokens = usage.prompt_tokens if usage else 0
+        completion_tokens = usage.completion_tokens if usage else 0
+        total_tokens = usage.total_tokens if usage else 0
+        cost_usd = (
+            (prompt_tokens / 1000.0) * settings.COST_PER_1K_INPUT
+            + (completion_tokens / 1000.0) * settings.COST_PER_1K_OUTPUT
+        )
         return {
             "enabled": True,
             "is_malicious": bool(result.get("is_malicious", False)),
@@ -109,4 +117,8 @@ class LLMMaliciousInputDetector:
             "confidence": float(result.get("confidence", 0.0) or 0.0),
             "reasoning": result.get("reasoning", ""),
             "model": settings.LLM_MODEL,
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens,
+            "cost_usd": cost_usd,
         }

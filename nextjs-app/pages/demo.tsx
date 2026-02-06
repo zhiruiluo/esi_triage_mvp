@@ -472,6 +472,9 @@ export default function DemoPage() {
               <strong>Cost breakdown</strong>
               <div style={{ color: "#475569", display: "grid", gap: "0.35rem" }}>
                 <div>
+                  Malicious layer: ${Number(result.intermediate?.layer_costs?.malicious || 0).toFixed(4)}
+                </div>
+                <div>
                   Red-flag layer: ${Number(result.intermediate?.layer_costs?.red_flag || 0).toFixed(4)}
                 </div>
                 <div>

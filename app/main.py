@@ -137,6 +137,7 @@ async def classify(request: Request, payload: ClassifyRequest):
     final_context["handbook_verification"] = handbook
 
     layer_costs = {
+        "malicious": float(malicious_llm_check.get("cost_usd", 0.0) or 0.0),
         "red_flag": float(red_flag.get("cost_usd", 0.0) or 0.0),
         "final_decision": float(final_decision.get("cost_usd", 0.0) or 0.0),
         "vitals": 0.0,
@@ -171,9 +172,21 @@ async def classify(request: Request, payload: ClassifyRequest):
             "layer_costs": layer_costs,
         },
         "cost": {
-            "prompt_tokens": red_flag.get("prompt_tokens", 0) + final_decision.get("prompt_tokens", 0),
-            "completion_tokens": red_flag.get("completion_tokens", 0) + final_decision.get("completion_tokens", 0),
-            "total_tokens": red_flag.get("total_tokens", 0) + final_decision.get("total_tokens", 0),
+            "prompt_tokens": (
+                malicious_llm_check.get("prompt_tokens", 0)
+                + red_flag.get("prompt_tokens", 0)
+                + final_decision.get("prompt_tokens", 0)
+            ),
+            "completion_tokens": (
+                malicious_llm_check.get("completion_tokens", 0)
+                + red_flag.get("completion_tokens", 0)
+                + final_decision.get("completion_tokens", 0)
+            ),
+            "total_tokens": (
+                malicious_llm_check.get("total_tokens", 0)
+                + red_flag.get("total_tokens", 0)
+                + final_decision.get("total_tokens", 0)
+            ),
             "estimated_cost_usd": total_cost,
             "budget_remaining_usd": rate_limiter.get_remaining_budget(client_ip),
         },
