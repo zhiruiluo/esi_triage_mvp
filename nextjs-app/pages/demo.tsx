@@ -376,19 +376,19 @@ export default function DemoPage() {
               <strong>Cost breakdown</strong>
               <div style={{ color: "#475569", display: "grid", gap: "0.35rem" }}>
                 <div>
-                  Red-flag layer: ${Number(result.intermediate?.red_flags?.cost_usd || 0).toFixed(4)}
+                  Red-flag layer: ${Number(result.intermediate?.layer_costs?.red_flag || 0).toFixed(4)}
                 </div>
                 <div>
-                  Vitals layer: ${Number(result.intermediate?.vitals?.cost_usd || 0).toFixed(4)}
+                  Vitals layer: ${Number(result.intermediate?.layer_costs?.vitals || 0).toFixed(4)}
                 </div>
                 <div>
-                  Resources layer: ${Number(result.intermediate?.resources?.cost_usd || 0).toFixed(4)}
+                  Resources layer: ${Number(result.intermediate?.layer_costs?.resources || 0).toFixed(4)}
                 </div>
                 <div>
-                  Handbook layer: ${Number(result.intermediate?.handbook_verification?.cost_usd || 0).toFixed(4)}
+                  Handbook layer: ${Number(result.intermediate?.layer_costs?.handbook || 0).toFixed(4)}
                 </div>
                 <div>
-                  Final decision: ${Number(result.intermediate?.final_decision?.cost_usd || 0).toFixed(4)}
+                  Final decision: ${Number(result.intermediate?.layer_costs?.final_decision || 0).toFixed(4)}
                 </div>
                 <div style={{ marginTop: "0.25rem", color: "#0f172a" }}>
                   Total: ${Number(result.cost?.estimated_cost_usd || 0).toFixed(4)}

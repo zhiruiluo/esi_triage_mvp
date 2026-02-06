@@ -104,6 +104,15 @@ async def classify(request: Request, payload: ClassifyRequest):
     final_decision = await final_detector.decide(payload.case_text, final_context, model=final_model)
     rate_limiter.add_cost(client_ip, red_flag.get("cost_usd", 0.0))
 
+    layer_costs = {
+        "red_flag": float(red_flag.get("cost_usd", 0.0) or 0.0),
+        "final_decision": float(final_decision.get("cost_usd", 0.0) or 0.0),
+        "vitals": 0.0,
+        "resources": 0.0,
+        "handbook": 0.0,
+    }
+    total_cost = sum(layer_costs.values())
+
     return {
         "esi_level": final_decision.get("esi", preliminary_esi),
         "confidence": final_decision.get("confidence", 0.6),
@@ -111,6 +120,7 @@ async def classify(request: Request, payload: ClassifyRequest):
         "intermediate": {
             "extraction": extracted,
             "red_flags": red_flag.get("flags", []),
+            "red_flag_layer": red_flag,
             "severity": red_flag.get("severity_score", 0.0),
             "has_red_flags": red_flag.get("has_red_flags", False),
             "vitals": vital,
@@ -122,12 +132,13 @@ async def classify(request: Request, payload: ClassifyRequest):
                 "red_flag_model": red_flag.get("model", red_flag_model),
                 "final_decision_model": final_decision.get("model", final_model),
             },
+            "layer_costs": layer_costs,
         },
         "cost": {
             "prompt_tokens": red_flag.get("prompt_tokens", 0) + final_decision.get("prompt_tokens", 0),
             "completion_tokens": red_flag.get("completion_tokens", 0) + final_decision.get("completion_tokens", 0),
             "total_tokens": red_flag.get("total_tokens", 0) + final_decision.get("total_tokens", 0),
-            "estimated_cost_usd": red_flag.get("cost_usd", 0.0) + final_decision.get("cost_usd", 0.0),
+            "estimated_cost_usd": total_cost,
             "budget_remaining_usd": rate_limiter.get_remaining_budget(client_ip),
         },
         "queries_remaining": rate_limiter.get_remaining(client_ip),
