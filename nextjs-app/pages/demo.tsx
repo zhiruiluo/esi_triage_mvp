@@ -88,6 +88,57 @@ export default function DemoPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const vitalsLabelMap: Record<string, string> = {
+    hr: "Heart rate",
+    rr: "Respiratory rate",
+    sbp: "Systolic BP",
+    dbp: "Diastolic BP",
+    temp_f: "Temperature (F)",
+    spo2: "Oxygen saturation",
+  };
+
+  const resourceLabelMap: Record<string, string> = {
+    CXR: "Chest X-ray",
+    CBC: "Complete blood count",
+    ECG: "Electrocardiogram",
+    Troponin: "Troponin lab",
+    CMP: "Metabolic panel",
+    "CT Abdomen": "CT abdomen",
+    Sutures: "Suture repair",
+    "X-ray": "X-ray",
+  };
+
+  const vitalsRangeByAge = (age?: number | null): Record<string, string> => {
+    if (age !== undefined && age !== null && age < 1) {
+      return {
+        hr: "100–160 bpm",
+        rr: "30–60 /min",
+        sbp: "70–100 mmHg",
+        dbp: "50–65 mmHg",
+        temp_f: "97.0–99.5 °F",
+        spo2: "95–100%",
+      };
+    }
+    if (age !== undefined && age !== null && age < 12) {
+      return {
+        hr: "70–120 bpm",
+        rr: "18–30 /min",
+        sbp: "80–110 mmHg",
+        dbp: "55–75 mmHg",
+        temp_f: "97.0–99.5 °F",
+        spo2: "95–100%",
+      };
+    }
+    return {
+      hr: "60–100 bpm",
+      rr: "12–20 /min",
+      sbp: "90–120 mmHg",
+      dbp: "60–80 mmHg",
+      temp_f: "97.0–99.0 °F",
+      spo2: "95–100%",
+    };
+  };
+
   const groupedSamples = useMemo(() => {
     return SAMPLE_CASES.reduce<Record<number, SampleCase[]>>((acc, sample) => {
       acc[sample.esi] = acc[sample.esi] || [];
@@ -299,11 +350,26 @@ export default function DemoPage() {
             <div style={{ background: "#f8fafc", borderRadius: 12, padding: "0.75rem" }}>
               <strong>Vitals</strong>
               <p style={{ margin: "0.25rem 0" }}>
-                Critical: {result.intermediate?.vitals?.critical ? "Yes" : "No"}
+                Vitals Critical: {result.intermediate?.vitals?.critical ? "Yes" : "No"}
               </p>
-              <pre style={{ margin: 0, whiteSpace: "pre-wrap", color: "#475569" }}>
-                {JSON.stringify(result.intermediate?.vitals?.vitals || {}, null, 2)}
-              </pre>
+              <div style={{ display: "grid", gap: "0.5rem", color: "#475569" }}>
+                {Object.entries(result.intermediate?.vitals?.vitals || {}).length === 0 && (
+                  <span>No vitals extracted.</span>
+                )}
+                {Object.entries(result.intermediate?.vitals?.vitals || {}).map(
+                  ([key, value]) => (
+                    <div key={key}>
+                      <strong style={{ color: "#0f172a" }}>
+                        {vitalsLabelMap[key] || key}
+                      </strong>
+                      : {value}
+                      <span style={{ color: "#94a3b8" }}>
+                        {" "}· Typical range {vitalsRangeByAge(result.intermediate?.extraction?.age)[key] || "n/a"}
+                      </span>
+                    </div>
+                  )
+                )}
+              </div>
             </div>
 
             <div style={{ background: "#f8fafc", borderRadius: 12, padding: "0.75rem" }}>
@@ -311,9 +377,21 @@ export default function DemoPage() {
               <p style={{ margin: "0.25rem 0" }}>
                 Count: {result.intermediate?.resources?.resource_count ?? 0}
               </p>
-              <pre style={{ margin: 0, whiteSpace: "pre-wrap", color: "#475569" }}>
-                {JSON.stringify(result.intermediate?.resources?.resources || [], null, 2)}
-              </pre>
+              <div style={{ display: "grid", gap: "0.4rem", color: "#475569" }}>
+                {(result.intermediate?.resources?.resources || []).length === 0 && (
+                  <span>No resources inferred.</span>
+                )}
+                {(result.intermediate?.resources?.resources || []).map(
+                  (item: string, index: number) => (
+                    <div key={`${item}-${index}`}>
+                      <strong style={{ color: "#0f172a" }}>
+                        {resourceLabelMap[item] || item}
+                      </strong>
+                      {resourceLabelMap[item] ? ` (${item})` : ""}
+                    </div>
+                  )
+                )}
+              </div>
             </div>
 
             <div style={{ background: "#f8fafc", borderRadius: 12, padding: "0.75rem" }}>
