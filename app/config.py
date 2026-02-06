@@ -15,6 +15,9 @@ class Settings:
     LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
     LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "300"))
 
+    RESOURCE_LLM_ENABLED = os.getenv("RESOURCE_LLM_ENABLED", "false").lower() in {"1", "true", "yes"}
+    RESOURCE_LLM_MODEL = os.getenv("RESOURCE_LLM_MODEL", "gpt-4o-mini")
+
     ROUTER_ENABLED = os.getenv("ROUTER_ENABLED", "true").lower() in {"1", "true", "yes"}
     ROUTER_DEFAULT_MODEL = os.getenv("ROUTER_DEFAULT_MODEL", "gpt-4o-mini")
     ROUTER_MID_MODEL = os.getenv("ROUTER_MID_MODEL", "gpt-4o")

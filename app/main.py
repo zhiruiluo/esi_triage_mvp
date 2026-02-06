@@ -108,7 +108,7 @@ async def classify(request: Request, payload: ClassifyRequest):
         "red_flag": float(red_flag.get("cost_usd", 0.0) or 0.0),
         "final_decision": float(final_decision.get("cost_usd", 0.0) or 0.0),
         "vitals": 0.0,
-        "resources": 0.0,
+        "resources": float(resources.get("cost_usd", 0.0) or 0.0),
         "handbook": 0.0,
     }
     total_cost = sum(layer_costs.values())

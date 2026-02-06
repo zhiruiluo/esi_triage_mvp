@@ -219,16 +219,28 @@ export default function DemoPage() {
             <div style={{ color: "#64748b", fontSize: "0.85rem" }}>Clinical demo</div>
           </div>
         </div>
-        <div style={{ display: "flex", gap: "1rem" }}>
-          <Link href="/" style={{ textDecoration: "none", color: "#0f172a" }}>
-            Home
-          </Link>
-          <Link href="/demo" style={{ textDecoration: "none", color: "#0f172a" }}>
-            Demo
-          </Link>
-          <Link href="/admin" style={{ textDecoration: "none", color: "#0f172a" }}>
-            Admin
-          </Link>
+        <div style={{ display: "flex", gap: "0.75rem" }}>
+          {[
+            { href: "/", label: "Home" },
+            { href: "/demo", label: "Demo" },
+            { href: "/admin", label: "Admin" },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              style={{
+                textDecoration: "none",
+                color: "#0f172a",
+                padding: "0.35rem 0.75rem",
+                borderRadius: 999,
+                border: "1px solid #e2e8f0",
+                background: "white",
+                fontSize: "0.95rem",
+              }}
+            >
+              {item.label}
+            </Link>
+          ))}
         </div>
       </nav>
 
