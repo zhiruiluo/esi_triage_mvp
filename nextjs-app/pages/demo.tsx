@@ -504,6 +504,21 @@ export default function DemoPage() {
                   ))}
                 </ul>
               )}
+              <details style={{ marginTop: "0.5rem" }}>
+                <summary style={{ cursor: "pointer", color: "#475569" }}>
+                  Layer 1 raw output
+                </summary>
+                <pre
+                  style={{
+                    marginTop: "0.5rem",
+                    whiteSpace: "pre-wrap",
+                    fontSize: "0.8rem",
+                    color: "#475569",
+                  }}
+                >
+                  {JSON.stringify(result.intermediate?.red_flag_layer || {}, null, 2)}
+                </pre>
+              </details>
             </div>
 
             <div style={{ background: "#f8fafc", borderRadius: 14, padding: "0.9rem" }}>
