@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from typing import Optional
+
 from pydantic import BaseModel, Field
 
 from auth import RateLimiter
@@ -17,6 +19,10 @@ from api.routes import admin_rag
 
 class ClassifyRequest(BaseModel):
     case_text: str = Field(..., min_length=1, description="Patient case description")
+    model: Optional[str] = Field(
+        default=None,
+        description="LLM model override (use 'auto' or omit for routing)",
+    )
 
 
 app = FastAPI(title=settings.API_TITLE, version=settings.API_VERSION)
@@ -50,7 +56,10 @@ async def classify(request: Request, payload: ClassifyRequest):
     rate_limiter.increment(client_ip)
 
     extracted = extraction_detector.extract(payload.case_text)
-    red_flag_model = router.select_red_flag_model(payload.case_text, extracted)
+    model_override = payload.model if payload.model and payload.model != "auto" else None
+    red_flag_model = (
+        model_override or router.select_red_flag_model(payload.case_text, extracted)
+    )
     red_flag = await detector.classify(payload.case_text, extracted, model=red_flag_model)
     vital = await vital_detector.assess(payload.case_text, extracted)
     resources = await resource_detector.infer(payload.case_text, extracted)
@@ -88,7 +97,10 @@ async def classify(request: Request, payload: ClassifyRequest):
         "handbook_verification": handbook,
     }
 
-    final_model = router.select_final_decision_model(payload.case_text, final_context)
+    final_model = (
+        model_override
+        or router.select_final_decision_model(payload.case_text, final_context)
+    )
     final_decision = await final_detector.decide(payload.case_text, final_context, model=final_model)
     rate_limiter.add_cost(client_ip, red_flag.get("cost_usd", 0.0))
 
@@ -106,6 +118,7 @@ async def classify(request: Request, payload: ClassifyRequest):
             "handbook_verification": handbook,
             "final_decision": final_decision,
             "routing": {
+                "mode": "fixed" if model_override else "auto",
                 "red_flag_model": red_flag.get("model", red_flag_model),
                 "final_decision_model": final_decision.get("model", final_model),
             },

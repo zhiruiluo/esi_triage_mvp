@@ -88,6 +88,7 @@ export default function DemoPage() {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [modelChoice, setModelChoice] = useState("auto");
 
   const vitalsLabelMap: Record<string, string> = {
     hr: "Heart rate",
@@ -162,7 +163,7 @@ export default function DemoPage() {
       const response = await fetch("/api/classify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ case_text: caseText }),
+        body: JSON.stringify({ case_text: caseText, model: modelChoice }),
       });
 
       const data = await response.json();
@@ -280,7 +281,22 @@ export default function DemoPage() {
             </div>
           )}
 
-          <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
+          <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1rem", flexWrap: "wrap" }}>
+            <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+              <span style={{ color: "#475569", fontSize: "0.9rem" }}>Model</span>
+              <select
+                value={modelChoice}
+                onChange={(e) => setModelChoice(e.target.value)}
+                style={{ padding: "0.5rem", borderRadius: 8, border: "1px solid #cbd5f5" }}
+              >
+                <option value="auto">Auto (smart routing)</option>
+                <option value="gpt-4-turbo">gpt-4-turbo</option>
+                <option value="gpt-4o">gpt-4o</option>
+                <option value="gpt-4o-mini">gpt-4o-mini</option>
+                <option value="gpt-4">gpt-4</option>
+                <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+              </select>
+            </label>
             <button onClick={handleClassify} disabled={loading}>
               {loading ? "Classifying..." : "Classify"}
             </button>
@@ -454,6 +470,9 @@ export default function DemoPage() {
 
             <div style={{ background: "#f8fafc", borderRadius: 12, padding: "0.75rem" }}>
               <strong>Model routing</strong>
+              <p style={{ margin: "0.25rem 0" }}>
+                Mode: {result.intermediate?.routing?.mode || "auto"}
+              </p>
               <p style={{ margin: "0.25rem 0" }}>
                 Red-flag model: {result.intermediate?.routing?.red_flag_model || "n/a"}
               </p>

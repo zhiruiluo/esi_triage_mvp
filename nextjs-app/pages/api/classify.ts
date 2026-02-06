@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { case_text } = req.body || {};
+  const { case_text, model } = req.body || {};
 
   if (!case_text) {
     return res.status(400).json({ error: "case_text is required" });
@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const response = await fetch(`${API_URL}/classify`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ case_text }),
+      body: JSON.stringify({ case_text, model }),
     });
 
     const data = await response.json();
