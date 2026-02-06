@@ -78,5 +78,5 @@ async def info():
 
 
 # Include admin RAG configuration routes
-app.include_router(admin_rag.router, prefix="/admin", tags=["admin"])
+app.include_router(admin_rag.router, tags=["admin"])
 
