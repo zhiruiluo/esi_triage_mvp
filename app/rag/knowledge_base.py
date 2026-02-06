@@ -8,8 +8,6 @@ import os
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 
-from openai import AsyncOpenAI
-
 # For vector similarity (will integrate with Pinecone/Weaviate in production)
 try:
     import pinecone
@@ -36,10 +34,7 @@ class KnowledgeBase:
     
     def __init__(self, config: Dict[str, Any]):
         self.config = config
-        self.llm = AsyncOpenAI(
-            api_key=config.get("openrouter_api_key"),
-            base_url=config.get("openrouter_base_url", "https://openrouter.ai/api/v1")
-        )
+        # No LLM client needed for in-memory retrieval
         
         # Initialize vector DB (Pinecone or mock)
         self.use_vector_db = config.get("use_vector_db", False)
